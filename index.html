@@ -1,0 +1,77 @@
+<script>
+    function solveCubicEquation(a, b, c, d) {
+        var zero = 0.0000001,
+            //JavaScript fail to evaluate cube root from negative number - NaN
+            //http://www.ecma-international.org/ecma-262/5.1/#sec-15.8.2.13
+            cbrt = function (a) {
+                return a >= 0 ? Math.pow(a, 1 / 3) : -Math.pow(-a, 1 / 3);
+            };
+        if (Math.abs(a) > zero) {
+            // normalize, convert to form: x3 + ax2 + bx + c = 0
+            b = b / a;
+            c = c / a;
+            d = d / a;
+
+            var p = c - b * b / 3,
+                q = b * (2 * b * b - 9 * c) / 27 + d,
+                p3 = p * p * p;
+            D = q * q + 4 * p3 / 27,
+            subst = -b / 3;
+
+            if (D > zero) {
+                D = Math.sqrt(D)
+                var u = cbrt((-q + D) / 2),
+                    v = cbrt((-q - D) / 2);
+
+                return [u + v + subst];
+            } else if (D < -zero) {
+                //If (D < 0) => p < 0, change sign of p
+                var u = 2 * Math.sqrt(-p / 3),
+                v = Math.acos(-Math.sqrt(-27 / p3) * q / 2) / 3;
+                return [u * Math.cos(v) + subst,
+                    u * Math.cos(v + 2 * Math.PI / 3) + subst,
+                    u * Math.cos(v + 4 * Math.PI / 3) + subst];
+            } else {
+                // D zero
+                var u = -cbrt(q / 2);
+                return [2 * u + subst, -u + subst];
+            }
+        } else {
+            // a = 0, 2nd degree equation: ax3+bx2+cx+d => bx2+cx+d
+            if (Math.abs(b) <= zero) {
+                if (Math.abs(c) <= zero)
+                    return [];
+                else
+                    return [-d / c];
+            }
+            var D = c * c - 4 * b * d;
+            if (D > zero) {
+                D = Math.sqrt(D);
+                return [(-c - D) / (2 * b), (-c + D) / (2 * b)];
+            } else if (D < -zero) {
+                return [];
+            } else { //D = 0
+                return [-c / (2 * b)];
+            }
+        }
+    }
+
+    function solvePolynomialEquation() {
+        var inputs = document.getElementsByClassName('polynomial-equation')[0];
+        var args = [];
+        for (var i = 0; i < inputs.childNodes.length; i++)
+            if (inputs.childNodes[i].type == 'number')
+                args.push(parseFloat(inputs.childNodes[i].value));
+        var result = solveCubicEquation.apply(this, args);
+        document.getElementById('polynomial-solution').innerText = result;
+    }
+</script>
+<style>
+    .polynomial-equation input{ width:4em; }
+    #polynomial-solution { font-weight:bold;}
+</style>
+<div class="polynomial-equation">
+    <input type="number" value="1" /> x<sup>3</sup> + <input type="number" value="3" /> x<sup>2</sup> + <input type="number" value="0" /> x + <input type="number" value="-4" /> = 0
+    <input type="button" value="Oblicz" onclick="solvePolynomialEquation();" />
+    <div>Rozwiązania: <span id="polynomial-solution"></span></div>
+</div>
